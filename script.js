@@ -210,3 +210,13 @@ addEventListener("scroll", lightWords, { passive: true });
 lightWords();
 
 $("#year").textContent = new Date().getFullYear();
+
+/* ───────────── Smooth scroll (Lenis) ───────────── */
+
+if (window.Lenis && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const lenis = new Lenis({ duration: 1.15, anchors: true });  const raf = (t) => {
+    lenis.raf(t);
+    requestAnimationFrame(raf);
+  };
+  requestAnimationFrame(raf);
+}
