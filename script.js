@@ -4,39 +4,45 @@
 // Tip: add a hidden field named "bread" in Tally and the bread picked on the site gets prefilled.
 const TALLY_FORM_URL = "https://tally.so/r/M1e6AY";
 
-// Each week: order deadline (Mon 5pm) and delivery morning. The site shows the first week whose
-// deadline hasn't passed as "this week", then previews the next two.
-// Item = [中文, English, tone, tone text, photo]. Put a photo path (e.g. "images/choc.jpg") in the
-// last slot and it replaces the tonal placeholder inside the arch.
-const WEEKS = [
-  {
-    deadline: new Date(2026, 10, 2, 17, 0),
-    delivery: new Date(2026, 10, 4),
-    items: [
-      ["巧克力麵包", "Chocolate Bread", "#3a2216", "#f4eee3", ""],
-      ["奶酥麵包", "Milk Crumble Bun", "#d9a35f", "#2b1b12", ""],
-      ["蔥麵包", "Scallion Bread", "#6b7140", "#f4eee3", ""],
-    ],
-  },
-  {
-    deadline: new Date(2026, 10, 9, 17, 0),
-    delivery: new Date(2026, 10, 11),
-    items: [
-      ["抹茶紅豆麵包", "Matcha Red Bean Bread", "#8a9468", "#2b1b12", ""],
-      ["菠蘿麵包", "Pineapple Bun", "#cf8a38", "#2b1b12", ""],
-      ["鹽可頌", "Salt Croissant", "#e6d8ba", "#a9581f", ""],
-    ],
-  },
-  {
-    deadline: new Date(2026, 10, 16, 17, 0),
-    delivery: new Date(2026, 10, 18),
-    items: [
-      ["布丁麵包", "Custard Pudding Bread", "#e3bf73", "#2b1b12", ""],
-      ["蔓越莓貝果", "Cranberry Bagel", "#7a2e3a", "#f4eee3", ""],
-      ["巧克力麵包", "Chocolate Bread", "#3a2216", "#f4eee3", ""],
-    ],
-  },
-];
+// Weekly breads come from the admin page (/admin), stored on Netlify and served at /api/weeks.
+// If that isn't available (e.g. running locally) the site falls back to data/weeks.json.
+// The site shows the first week whose deadline hasn't passed as "this week", then previews the next two.
+
+const parseLocal = (s) => {
+  const [d, t = "00:00"] = s.split("T");
+  const [y, m, dd] = d.split("-").map(Number);
+  const [hh, mm] = t.split(":").map(Number);
+  return new Date(y, m - 1, dd, hh, mm);
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const textOn = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  const l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return l > 0.55 ? "#2b1b12" : "#f4eee3";
+};
+
+async function loadWeeks() {
+  const get = async (url) => {
+    const r = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(4000) });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  };
+  let raw = await get("/api/weeks").catch(() => null);
+  if (!raw?.weeks?.length) raw = await get("data/weeks.json").catch(() => ({ weeks: [] }));
+  return raw.weeks
+    .map((w) => ({
+      deadline: parseLocal(w.deadline),
+      delivery: parseLocal(w.delivery),
+      // Item = [中文, English, tone, tone text, photo]. Values are escaped because they end up in innerHTML.
+      items: w.items.map((it) => {
+        const tone = /^#[0-9a-f]{6}$/i.test(it.tone) ? it.tone : "#d9a35f";
+        const img = /^(\/api\/photo\/[a-z0-9-]+|images\/[\w./-]+)$/i.test(it.img || "") ? it.img : "";
+        return [esc(it.zh), esc(it.en), tone, textOn(tone), img];
+      }),
+    }))
+    .sort((a, b) => a.deadline - b.deadline);
+}
+const WEEKS = await loadWeeks();
 
 /* ───────────── Data → DOM ───────────── */
 

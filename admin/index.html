@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bread Co. — Weekly menu</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Jost:wght@400;500&family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Password gate -->
+  <main class="gate" id="gate">
+    <form id="login" autocomplete="off">
+      <p class="label">Bread Co.</p>
+      <h1>Weekly menu</h1>
+      <label>Password<input type="password" id="pw" required autofocus autocomplete="current-password"></label>
+      <button class="btn" type="submit">Unlock</button>
+      <p class="msg" id="login-msg" role="status"></p>
+    </form>
+  </main>
+
+  <!-- Editor -->
+  <div class="app" id="app" hidden>
+    <header class="top">
+      <div>
+        <p class="label">Bread Co. · admin</p>
+        <h1>Weekly menu</h1>
+      </div>
+      <a class="view" href="/" target="_blank" rel="noopener">View site →</a>
+    </header>
+
+    <p class="help">Add the three breads for each week. The site shows the first week whose order deadline hasn't passed as <b>this week</b>, then previews the following week as <b>next week</b>, and rolls over by itself. Press <b>Save</b> to publish.</p>
+
+    <div id="weeks"></div>
+    <button class="btn ghost" id="add-week" type="button">+ Add a week</button>
+
+    <div class="bar">
+      <span id="status" role="status">All saved</span>
+      <button class="btn" id="save" type="button" disabled>Save</button>
+    </div>
+  </div>
+
+  <script src="admin.js" type="module"></script>
+</body>
+</html>
