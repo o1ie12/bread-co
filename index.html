@@ -5,94 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bread Co. — 每週現烤</title>
   <meta name="description" content="Three small-batch breads a week, baked to order and delivered fresh. Order by Monday.">
-  <meta name="theme-color" content="#b5301e">
+  <meta name="theme-color" content="#f4eee3">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="icon" href="favicon.ico" sizes="48x48">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Noto+Serif+TC:wght@500;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..600&family=Jost:wght@400;500&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vendor/lenis/lenis.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <header class="nav" id="nav">
-    <a class="nav-logo" href="#top">Bread Co.</a>
-    <nav aria-label="Primary">
-      <a href="#week">This week</a>
-      <a href="#next">Next week</a>
-      <a href="#order" class="nav-cta">Order</a>
-    </nav>
+  <header class="nav" id="nav" data-theme="cream">
+    <a class="nav-logo" href="#top" aria-label="Bread Co.">
+      <svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><rect width="512" height="512" rx="112" fill="currentColor"/><g transform="rotate(-18 256 270)"><ellipse cx="256" cy="270" rx="170" ry="105" fill="var(--nav-bg)"/><g stroke="currentColor" stroke-width="26" stroke-linecap="round"><path d="M190 205V335"/><path d="M256 190V350"/><path d="M322 205V335"/></g></g></svg>
+      <span>Bread Co.</span>
+    </a>
+    <a class="nav-count" href="#order"><i></i><span id="nav-count">Orders open</span></a>
+    <a class="nav-order" href="#order">Order</a>
   </header>
 
   <main id="top">
 
     <!-- HERO -->
-    <section class="hero" data-theme="red">
-      <h1 class="xl fit" id="hero-word" aria-label="Bread Co."><span>Bread Co.</span></h1>
-
-      <svg class="sticker" viewBox="0 0 200 200" aria-hidden="true">
-        <circle cx="100" cy="100" r="100" fill="#f0b93f"/>
-        <defs><path id="circ" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/></defs>
-        <text><textPath href="#circ" startOffset="0" textLength="440" lengthAdjust="spacing">BAKED TO ORDER ✺ 每週現烤 ✺ BAKED TO ORDER ✺ 每週現烤 ✺</textPath></text>
-        <text x="100" y="128" text-anchor="middle" class="sticker-n">3</text>
-      </svg>
-
-      <div class="hero-row">
-        <p class="hero-copy">Three small-batch breads a week. Baked to order, delivered fresh to your door.<br><span class="zh">每週三款，現烤現送。</span></p>
-        <dl class="hero-deadline" id="hero-deadline"></dl>
-        <a href="#week" class="btn btn-cream">See this week <i>↓</i></a>
+    <section class="hero" data-theme="cream">
+      <div class="hero-meta grid">
+        <p class="c1"><span class="k">Weekly bakery</span><span class="zh">每週現烤</span></p>
+        <p class="c5"><span class="k">Order by</span><span id="m-deadline">—</span><em id="m-count"></em></p>
+        <p class="c9"><span class="k">Delivered</span><span id="m-delivery">—</span></p>
       </div>
-
-      <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+      <p class="vert zh" aria-hidden="true">每週三款　現烤現送</p>
+      <h1 class="mark" id="mark" aria-label="Bread Co."><span>Bread Co.</span></h1>
     </section>
 
     <!-- THIS WEEK -->
-    <section class="week" id="week" data-theme="cream">
-      <div class="sec-head">
-        <h2 class="xl2 rv"><span>This</span> <span>Week</span></h2>
-        <div class="sec-meta rv">
-          <p class="label">本週麵包 · 3 breads</p>
-          <dl class="dates" id="week-dates"></dl>
-        </div>
+    <section class="week grid" id="week" data-theme="cream2">
+      <div class="week-left">
+        <p class="label rv">本週麵包 · Three breads</p>
+        <h2 class="rv">This week</h2>
+        <dl class="dates rv" id="week-dates"></dl>
+        <a class="arch rv" id="week-arch" href="#order" aria-label="Order this bread"></a>
       </div>
-      <ol class="tiles" id="tiles"></ol>
+      <ol class="week-list" id="week-list"></ol>
     </section>
 
     <!-- STATEMENT -->
-    <section class="statement" data-theme="ink">
-      <p class="label rv">About</p>
-      <p class="big-text" id="statement">Flour, water, salt and time. Nothing else. Three breads a week, baked to order and delivered fresh on Wednesday morning.</p>
-      <p class="zh-line rv">麵粉、水、鹽，還有時間。每週三款，現烤現送。</p>
-      <ul class="facts rv">
-        <li><b>03</b><span>Breads a week</span></li>
-        <li><b>Mon</b><span>Order by 5 PM</span></li>
-        <li><b>Wed</b><span>Delivered in the morning</span></li>
-      </ul>
+    <section class="statement grid" data-theme="ink">
+      <p class="label rv">Our way</p>
+      <div class="st-body">
+        <p class="big-text" id="statement">Flour, water, salt and time. Nothing else. Three breads a week, baked to order and delivered fresh on Wednesday morning.</p>
+        <p class="zh-line rv">麵粉、水、鹽，還有時間。每週三款，現烤現送。</p>
+      </div>
     </section>
 
     <!-- NEXT WEEK -->
-    <section class="next" id="next" data-theme="red" hidden>
-      <div class="sec-head">
-        <h2 class="xl2 rv"><span>Next</span> <span>Week</span></h2>
-        <div class="sec-meta rv">
-          <p class="label">下週預告 · Preview</p>
-          <dl class="dates" id="next-dates"></dl>
+    <section class="next" id="next" data-theme="cream" hidden>
+      <header class="next-head grid">
+        <div class="nh-l">
+          <p class="label rv">下週預告 · A preview</p>
+          <h2 class="rv">Next week</h2>
         </div>
-      </div>
+        <dl class="dates rv" id="next-dates"></dl>
+      </header>
       <ol class="rows" id="rows"></ol>
       <div class="after rv" id="after" hidden></div>
     </section>
 
     <!-- ORDER -->
-    <section class="order" id="order" data-theme="cream">
-      <div class="sec-head">
-        <h2 class="xl2 rv"><span>Order</span></h2>
-        <div class="sec-meta rv">
-          <p class="label">訂購 · Tally form</p>
-          <p class="order-note" id="order-note"></p>
-        </div>
+    <section class="order grid" id="order" data-theme="cream2">
+      <div class="order-head rv">
+        <p class="label">訂購 · Order</p>
+        <h2>Reserve<br>your bread</h2>
+        <p class="order-note" id="order-note"></p>
       </div>
       <div class="form-wrap rv" id="form-wrap"></div>
     </section>
@@ -103,7 +88,7 @@
       <span>Baked to order · Delivered weekly</span>
       <span>© <span id="year">2026</span> Bread Co.</span>
     </div>
-    <div class="xl fit foot-word" id="foot-word" aria-hidden="true"><span>Bread Co.</span></div>
+    <p class="foot-mark fit" id="foot-mark" aria-hidden="true"><span>Bread Co.</span></p>
   </footer>
 
   <script src="vendor/lenis/lenis.min.js"></script>
