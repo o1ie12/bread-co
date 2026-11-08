@@ -305,6 +305,8 @@ form.addEventListener("submit", async (e) => {
   if (data.payment === "bank" && !bankOk) {
     $("#bank-total").textContent = count() && priceable() ? money(total()) : "—";
     $("#bank-err").textContent = "";
+    const qr = bank.querySelector(".bank-qr");
+    if (!qr.src) qr.src = qr.dataset.src;
     if (!bank.open) bank.showModal();
     syncBank();
     return;
