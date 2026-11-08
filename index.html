@@ -23,31 +23,22 @@
       <span>Bread Co.</span>
     </a>
     <a class="nav-count" href="#order"><i></i><span id="nav-count">Orders open</span></a>
-    <a class="nav-order" href="#order">Order</a>
+    <button class="nav-order" id="nav-order" type="button">Order</button>
   </header>
 
   <main id="top">
 
-    <!-- HERO -->
-    <section class="hero" data-theme="cream">
-      <div class="hero-meta grid">
-        <p class="c1"><span class="k">Weekly bakery</span><span class="zh">每週現烤</span></p>
-        <p class="c5"><span class="k">Order by</span><span id="m-deadline">—</span><em id="m-count"></em></p>
-        <p class="c9"><span class="k">Delivered</span><span id="m-delivery">—</span></p>
+    <!-- ORDER: the first screen is the order form -->
+    <section class="shop" id="order" data-theme="cream">
+      <div class="shop-top">
+        <div class="st-l">
+          <p class="label">本週麵包 · This week</p>
+          <h1 class="mark" id="mark" aria-label="Bread Co."><span>Bread Co.</span></h1>
+        </div>
+        <dl class="st-meta" id="shop-meta"></dl>
       </div>
-      <p class="vert zh" aria-hidden="true">每週三款　現烤現送</p>
-      <h1 class="mark" id="mark" aria-label="Bread Co."><span>Bread Co.</span></h1>
-    </section>
-
-    <!-- THIS WEEK -->
-    <section class="week grid" id="week" data-theme="cream2">
-      <div class="week-left">
-        <p class="label rv">本週麵包 · Three breads</p>
-        <h2 class="rv">This week</h2>
-        <dl class="dates rv" id="week-dates"></dl>
-        <a class="arch rv" id="week-arch" href="#order" aria-label="Order this bread"></a>
-      </div>
-      <ol class="week-list" id="week-list"></ol>
+      <p class="closed-note" id="closed-note" hidden></p>
+      <ol class="cards" id="cards"></ol>
     </section>
 
     <!-- STATEMENT -->
@@ -71,16 +62,6 @@
       <ol class="rows" id="rows"></ol>
       <div class="after rv" id="after" hidden></div>
     </section>
-
-    <!-- ORDER -->
-    <section class="order grid" id="order" data-theme="cream2">
-      <div class="order-head rv">
-        <p class="label">訂購 · Order</p>
-        <h2>Reserve<br>your bread</h2>
-        <p class="order-note" id="order-note"></p>
-      </div>
-      <div class="form-wrap rv" id="form-wrap"></div>
-    </section>
   </main>
 
   <footer class="footer" data-theme="ink">
@@ -90,6 +71,48 @@
     </div>
     <p class="foot-mark fit" id="foot-mark" aria-hidden="true"><span>Bread Co.</span></p>
   </footer>
+
+  <!-- Sticky cart bar -->
+  <div class="cartbar" id="cartbar" hidden>
+    <div class="cb-sum"><b id="cb-count">0 breads</b><span id="cb-total"></span></div>
+    <button class="btn" id="cb-go" type="button">Checkout →</button>
+  </div>
+
+  <!-- Checkout drawer -->
+  <dialog id="sheet" aria-labelledby="sheet-title">
+    <div class="sheet-in" data-lenis-prevent>
+      <button class="sheet-x" id="sheet-x" type="button" aria-label="Close">×</button>
+
+      <div id="sheet-form">
+        <p class="label">訂購 · Checkout</p>
+        <h2 id="sheet-title">Your order</h2>
+        <ul class="lines" id="lines"></ul>
+        <div class="total"><span>Total</span><b id="total">—</b></div>
+
+        <form id="order-form" novalidate>
+          <label>姓名 · Name<input name="name" required autocomplete="name" maxlength="60"></label>
+          <label>聯絡方式 · Email, LINE or Instagram<input name="contact" required maxlength="80"></label>
+          <label>送貨地址 · Delivery address<textarea name="address" rows="2" required autocomplete="street-address" maxlength="240"></textarea></label>
+          <label>備註 · Notes (optional)<textarea name="note" rows="2" maxlength="240"></textarea></label>
+          <input class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="pay" id="pay-note" hidden></p>
+          <p class="form-err" id="form-err" role="alert"></p>
+          <button class="btn wide" id="place" type="submit">Place order</button>
+        </form>
+      </div>
+
+      <div id="sheet-done" hidden>
+        <p class="label">收到了 · Received</p>
+        <h2>Thank you<span id="done-name"></span></h2>
+        <p class="done-no">Order <b id="done-no"></b></p>
+        <ul class="lines" id="done-lines"></ul>
+        <div class="total"><span>Total</span><b id="done-total">—</b></div>
+        <p class="pay" id="done-pay" hidden></p>
+        <p class="done-note">We'll confirm your order at <b id="done-contact"></b>. Delivered <b id="done-when"></b>.</p>
+        <button class="btn wide" id="done-close" type="button">Done</button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="vendor/lenis/lenis.min.js"></script>
   <script type="module" src="script.js"></script>

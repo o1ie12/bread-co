@@ -1,30 +1,108 @@
 {
+  "v": 2,
+  "timezone": "Asia/Taipei",
+  "paymentNote": "",
   "weeks": [
     {
+      "id": "w1102",
       "deadline": "2026-11-02T17:00",
       "delivery": "2026-11-04",
       "items": [
-        { "zh": "巧克力麵包", "en": "Chocolate Bread", "tone": "#3a2216", "img": "" },
-        { "zh": "奶酥麵包", "en": "Milk Crumble Bun", "tone": "#d9a35f", "img": "" },
-        { "zh": "蔥麵包", "en": "Scallion Bread", "tone": "#6b7140", "img": "" }
+        {
+          "id": "1102a",
+          "zh": "巧克力麵包",
+          "en": "Chocolate Bread",
+          "tone": "#3a2216",
+          "img": "",
+          "price": null,
+          "stock": null
+        },
+        {
+          "id": "1102b",
+          "zh": "奶酥麵包",
+          "en": "Milk Crumble Bun",
+          "tone": "#d9a35f",
+          "img": "",
+          "price": null,
+          "stock": null
+        },
+        {
+          "id": "1102c",
+          "zh": "蔥麵包",
+          "en": "Scallion Bread",
+          "tone": "#6b7140",
+          "img": "",
+          "price": null,
+          "stock": null
+        }
       ]
     },
     {
+      "id": "w1109",
       "deadline": "2026-11-09T17:00",
       "delivery": "2026-11-11",
       "items": [
-        { "zh": "抹茶紅豆麵包", "en": "Matcha Red Bean Bread", "tone": "#8a9468", "img": "" },
-        { "zh": "菠蘿麵包", "en": "Pineapple Bun", "tone": "#cf8a38", "img": "" },
-        { "zh": "鹽可頌", "en": "Salt Croissant", "tone": "#e6d8ba", "img": "" }
+        {
+          "id": "1109a",
+          "zh": "抹茶紅豆麵包",
+          "en": "Matcha Red Bean Bread",
+          "tone": "#8a9468",
+          "img": "",
+          "price": 40,
+          "stock": 10
+        },
+        {
+          "id": "1109b",
+          "zh": "南瓜葡萄麵包",
+          "en": "Pumpkin Raisin Bread",
+          "tone": "#c9782a",
+          "img": "",
+          "price": 40,
+          "stock": 10
+        },
+        {
+          "id": "1109c",
+          "zh": "鹽可頌",
+          "en": "Salt Croissant",
+          "tone": "#e6d8ba",
+          "img": "",
+          "price": 50,
+          "stock": 8
+        }
       ]
     },
     {
+      "id": "w1116",
       "deadline": "2026-11-16T17:00",
       "delivery": "2026-11-18",
       "items": [
-        { "zh": "布丁麵包", "en": "Custard Pudding Bread", "tone": "#e3bf73", "img": "" },
-        { "zh": "蔓越莓貝果", "en": "Cranberry Bagel", "tone": "#7a2e3a", "img": "" },
-        { "zh": "巧克力麵包", "en": "Chocolate Bread", "tone": "#3a2216", "img": "" }
+        {
+          "id": "1116a",
+          "zh": "布丁麵包",
+          "en": "Custard Pudding Bread",
+          "tone": "#e3bf73",
+          "img": "",
+          "price": null,
+          "stock": null
+        },
+        {
+          "id": "1116b",
+          "zh": "蔓越莓貝果",
+          "en": "Cranberry Bagel",
+          "tone": "#7a2e3a",
+          "img": "",
+          "price": null,
+          "stock": null
+        },
+        {
+          "id": "1116c",
+          "zh": "巧克力麵包",
+          "en": "Chocolate Bread",
+          "tone": "#3a2216",
+          "img": "",
+          "price": null,
+          "stock": null
+        }
       ]
     }
   ]

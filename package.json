@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Bread Co. weekly bakery site with a private admin page",
   "dependencies": {
-    "@netlify/blobs": "^8.1.0"
-  }
+    "@netlify/blobs": "^10.7.13"
+  },
+  "type": "module"
 }
