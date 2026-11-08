@@ -265,7 +265,7 @@ function openSheet() {
   $("#form-err").textContent = "";
   $("#lines").innerHTML = cur.items.filter(qtyOf).map((it) => lineHTML(it, qtyOf(it))).join("");
   $("#total").textContent = priceable() ? money(total()) : "—";
-  for (const k of ["name", "contact", "address"]) if (saved[k] && !form.elements[k].value) form.elements[k].value = saved[k];
+  for (const k of ["name", "email"]) if (saved[k] && !form.elements[k].value) form.elements[k].value = saved[k];
   const pn = $("#pay-note");
   pn.hidden = !paymentNote;
   pn.textContent = paymentNote;
@@ -295,8 +295,16 @@ form.addEventListener("submit", async (e) => {
   const err = $("#form-err");
   err.textContent = "";
   const data = Object.fromEntries(new FormData(form));
-  if (!data.name.trim() || !data.contact.trim() || !data.address.trim()) {
-    err.textContent = "Please fill in your name, contact and delivery address. 請填寫姓名、聯絡方式與地址。";
+  if (!data.name.trim()) {
+    err.textContent = "Please enter your name. 請填寫姓名。";
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email.trim())) {
+    err.textContent = "Please enter a valid email. 請填寫正確的電子郵件。";
+    return;
+  }
+  if (data.payment !== "cash") {
+    err.textContent = "Please choose a payment method. 請選擇付款方式。";
     return;
   }
   const btn = $("#place");
@@ -309,7 +317,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         week: cur.id,
         items: Object.entries(cart).map(([id, qty]) => ({ id, qty })),
-        name: data.name, contact: data.contact, address: data.address, note: data.note, hp: data.hp,
+        name: data.name, email: data.email.trim(), payment: data.payment, note: data.note, hp: data.hp,
       }),
     });
     const out = await res.json().catch(() => ({}));
@@ -332,14 +340,17 @@ form.addEventListener("submit", async (e) => {
 
 function showDone(out, data) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ name: data.name, contact: data.contact, address: data.address }));
+    localStorage.setItem(KEY, JSON.stringify({ name: data.name, email: data.email.trim() }));
   } catch {}
   const items = cur.items.filter(qtyOf);
   $("#done-name").textContent = data.name.trim() ? `, ${data.name.trim().split(/\s+/)[0]}` : "";
   $("#done-no").textContent = out.no ? `#${String(out.no).padStart(3, "0")}` : "";
   $("#done-lines").innerHTML = items.map((it) => lineHTML(it, qtyOf(it))).join("");
   $("#done-total").textContent = out.total != null ? money(out.total) : "—";
-  $("#done-contact").textContent = data.contact.trim();
+  const mail = $("#done-mail");
+  mail.textContent = out.emailed
+    ? `A confirmation email is on its way to ${data.email.trim()}.`
+    : `We have your order and will be in touch at ${data.email.trim()}.`;
   $("#done-when").textContent = `${day(cur.delivery)} morning`;
   const dp = $("#done-pay");
   dp.hidden = !paymentNote;

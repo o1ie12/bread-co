@@ -123,3 +123,8 @@ select:focus { outline: none; border-color: var(--ink); }
   .s-bar { grid-column: 1 / -1; order: 3; }
   .pair { grid-template-columns: 1fr 1fr; }
 }
+
+.o-pay { color: var(--ink) !important; }
+.o-mail { font-size: 0.8rem; }
+.o-mail.sent { color: #3f6b2a !important; }
+.o-mail.failed { color: #b3261e !important; }

@@ -1,6 +1,7 @@
 import { isAdmin, json } from "../lib/auth.mjs";
 import { loadConfig, ordersStore, orderKey, numberKey, pad, soldCounts, countOrders, claimSlots, HttpError } from "../lib/data.mjs";
 import { wallToEpoch } from "../../shared/time.js";
+import { emailEnabled, sendMail, confirmationEmail, ownerEmail } from "../lib/email.mjs";
 
 const clean = (v, n) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, n);
 const STATUSES = new Set(["new", "paid", "delivered", "cancelled"]);
@@ -11,16 +12,38 @@ async function readOrders(store, week) {
   return orders.filter(Boolean).sort((x, y) => x.no - y.no);
 }
 
+// Confirmation to the customer plus an alert to the owner. Returns "sent" | "failed" | "off".
+async function notify(order, week, cfg, req) {
+  if (!emailEnabled()) return "off";
+  let status = "sent";
+  try {
+    await sendMail({ to: order.email, replyTo: process.env.OWNER_EMAIL || undefined, ...confirmationEmail(order, week, cfg.paymentNote) });
+  } catch (e) {
+    console.error("confirmation email failed:", e.message);
+    status = "failed";
+  }
+  if (process.env.OWNER_EMAIL) {
+    try {
+      await sendMail({ to: process.env.OWNER_EMAIL, replyTo: order.email, ...ownerEmail(order, week, `${new URL(req.url).origin}/admin/`) });
+    } catch (e) {
+      console.error("owner email failed:", e.message);
+    }
+  }
+  return status;
+}
+
 async function placeOrder(req) {
   const b = await req.json().catch(() => null);
   if (!b) throw new HttpError(400, { error: "Bad request" });
   if (b.hp) return json({ ok: true }); // honeypot: bots fill this in; pretend it worked
 
   const name = clean(b.name, 60);
-  const contact = clean(b.contact, 80);
-  const address = clean(b.address, 240);
+  const email = clean(b.email, 120);
+  const payment = clean(b.payment, 20);
   const note = clean(b.note, 240);
-  if (!name || !contact || !address) throw new HttpError(400, { error: "Please fill in your name, contact and delivery address." });
+  if (!name) throw new HttpError(400, { error: "Please enter your name." });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "Please enter a valid email address." });
+  if (payment !== "cash") throw new HttpError(400, { error: "That payment method isn't available yet. Please choose in-person cash." });
 
   const cfg = await loadConfig();
   const week = cfg.weeks.find((w) => w.id === b.week);
@@ -88,14 +111,18 @@ async function placeOrder(req) {
   const order = {
     no,
     at: new Date().toISOString(),
-    name, contact, address, note,
+    name, email, payment, note,
     items: lines.map(({ stock, ...rest }) => rest),
     total,
     status: "new",
     slots: claimed,
   };
   await store.setJSON(orderKey(week.id, no), order);
-  return json({ ok: true, no, total, sold: await soldCounts(store, week.id) });
+
+  // 4. emails (a failure here never fails the order)
+  order.emailStatus = await notify(order, week, cfg, req);
+  await store.setJSON(orderKey(week.id, no), order);
+  return json({ ok: true, no, total, emailed: order.emailStatus === "sent", sold: await soldCounts(store, week.id) });
 }
 
 export default async (req) => {
@@ -121,6 +148,25 @@ export default async (req) => {
       }
       if (req.method === "PATCH") {
         const b = await req.json().catch(() => ({}));
+        if (b.action === "resend") {
+          if (!/^[a-z0-9-]{1,40}$/i.test(b.week || "")) return json({ error: "Bad request" }, 400);
+          if (!emailEnabled()) return json({ error: "Email isn't set up yet (see README)." }, 400);
+          const store = ordersStore();
+          const key = orderKey(b.week, Number(b.no));
+          const o = await store.get(key, { type: "json" });
+          const cfg = await loadConfig();
+          const week = cfg.weeks.find((w) => w.id === b.week);
+          if (!o || !week || !o.email) return json({ error: "Order not found" }, 404);
+          try {
+            await sendMail({ to: o.email, replyTo: process.env.OWNER_EMAIL || undefined, ...confirmationEmail(o, week, cfg.paymentNote) });
+            o.emailStatus = "sent";
+          } catch (e) {
+            console.error("resend failed:", e.message);
+            o.emailStatus = "failed";
+          }
+          await store.setJSON(key, o);
+          return json({ ok: o.emailStatus === "sent", emailStatus: o.emailStatus });
+        }
         if (!/^[a-z0-9-]{1,40}$/i.test(b.week || "") || !STATUSES.has(b.status)) return json({ error: "Bad request" }, 400);
         const store = ordersStore();
         const key = orderKey(b.week, Number(b.no));

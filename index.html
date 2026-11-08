@@ -82,8 +82,18 @@
 
         <form id="order-form" novalidate>
           <label>姓名 · Name<input name="name" required autocomplete="name" maxlength="60"></label>
-          <label>聯絡方式 · Email, LINE or Instagram<input name="contact" required maxlength="80"></label>
-          <label>送貨地址 · Delivery address<textarea name="address" rows="2" required autocomplete="street-address" maxlength="240"></textarea></label>
+          <label>電子郵件 · Email<input name="email" type="email" required autocomplete="email" inputmode="email" maxlength="120"></label>
+          <fieldset class="methods">
+            <legend>付款方式 · Payment method</legend>
+            <label class="opt off">
+              <input type="radio" name="payment" value="bank" disabled>
+              <span><b>銀行轉帳 · Bank transfer</b><small>Unavailable for now · 暫不開放</small></span>
+            </label>
+            <label class="opt">
+              <input type="radio" name="payment" value="cash" checked>
+              <span><b>當面現金 · In-person cash</b><small>Pay in cash in person · 當面付現</small></span>
+            </label>
+          </fieldset>
           <label>備註 · Notes (optional)<textarea name="note" rows="2" maxlength="240"></textarea></label>
           <input class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <p class="pay" id="pay-note" hidden></p>
@@ -99,7 +109,8 @@
         <ul class="lines" id="done-lines"></ul>
         <div class="total"><span>Total</span><b id="done-total">—</b></div>
         <p class="pay" id="done-pay" hidden></p>
-        <p class="done-note">We'll confirm your order at <b id="done-contact"></b>. Delivered <b id="done-when"></b>.</p>
+        <p class="done-note"><span id="done-mail"></span> Delivered <b id="done-when"></b>.</p>
+        <p class="done-pay">Payment: <b>In-person cash · 當面現金</b></p>
         <button class="btn wide" id="done-close" type="button">Done</button>
       </div>
     </div>

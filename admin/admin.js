@@ -379,7 +379,12 @@ function renderOrders() {
         </select>
       </div>
       <div class="o-body">
-        <div class="o-who"><b>${esc(o.name)}</b><span>${esc(o.contact)}</span><span>${esc(o.address)}</span>${o.note ? `<em>“${esc(o.note)}”</em>` : ""}</div>
+        <div class="o-who"><b>${esc(o.name)}</b>
+          <span>${esc(o.email || o.contact || "")}</span>
+          ${o.address ? `<span>${esc(o.address)}</span>` : ""}
+          <span class="o-pay">${o.payment === "cash" ? "In-person cash" : esc(o.payment || "")}</span>
+          ${o.email ? `<span class="o-mail ${esc(o.emailStatus || "off")}">${o.emailStatus === "sent" ? "Confirmation email sent" : o.emailStatus === "failed" ? "Confirmation email failed" : "No confirmation email sent"} · <button type="button" class="link-btn" data-resend="${o.no}">${o.emailStatus === "sent" ? "Resend" : "Send"}</button></span>` : ""}
+          ${o.note ? `<em>“${esc(o.note)}”</em>` : ""}</div>
         <ul class="o-items">${o.items.map((i) => `<li><b>${i.qty}×</b> ${esc(i.zh)}${i.en ? ` <small>${esc(i.en)}</small>` : ""}</li>`).join("")}</ul>
         <div class="o-total">${o.total != null ? money(o.total) : ""}</div>
       </div>
@@ -387,6 +392,20 @@ function renderOrders() {
     )
     .join("");
 }
+
+$("#ord-list").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-resend]");
+  if (!b) return;
+  b.textContent = "Sending…";
+  b.disabled = true;
+  try {
+    const out = await api("/api/admin/orders", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ week: weekId, no: Number(b.dataset.resend), action: "resend" }) });
+    if (!out.ok) alert("The email couldn't be sent. Check the email settings in Netlify.");
+  } catch (err) {
+    alert(err.message);
+  }
+  await loadOrders();
+});
 
 $("#ord-list").addEventListener("change", async (e) => {
   const sel = e.target.closest(".o-status");
@@ -409,9 +428,9 @@ $("#ord-list").addEventListener("change", async (e) => {
 
 $("#ord-csv").addEventListener("click", () => {
   const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const head = ["Order", "Time", "Name", "Contact", "Address", "Items", "Total", "Status", "Note"];
+  const head = ["Order", "Time", "Name", "Email", "Payment", "Items", "Total", "Status", "Note"];
   const lines = orders.map((o) =>
-    [o.no, new Date(o.at).toLocaleString("en-US"), o.name, o.contact, o.address, o.items.map((i) => `${i.qty}x ${i.zh} ${i.en || ""}`.trim()).join("; "), o.total ?? "", o.status, o.note].map(q).join(",")
+    [o.no, new Date(o.at).toLocaleString("en-US"), o.name, o.email || o.contact || "", o.payment === "cash" ? "In-person cash" : o.payment || "", o.items.map((i) => `${i.qty}x ${i.zh} ${i.en || ""}`.trim()).join("; "), o.total ?? "", o.status, o.note].map(q).join(",")
   );
   const blob = new Blob(["﻿" + [head.map(q).join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
