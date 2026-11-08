@@ -263,3 +263,8 @@ section { padding: clamp(80px, 10vw, 150px) var(--gutter); }
 @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .link-btn { background: none; border: 0; font: 500 0.64rem var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 1px solid currentColor; padding: 0 0 2px; }
 .link-btn:hover { color: var(--crust); }
+.bank-acct { margin: 18px 0 4px; text-align: left; border-top: 1px solid var(--line); padding-top: 14px; }
+.bank-acct p { margin: 0; font: 400 0.9rem var(--sans); color: var(--muted); }
+.bank-acct b { color: var(--ink); font-weight: 500; }
+.bank-acct .acct-no { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.bank-acct .acct-no b { font: 500 1.35rem var(--serif); letter-spacing: 0.04em; user-select: all; }

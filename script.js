@@ -353,6 +353,13 @@ $("#bank-go").addEventListener("click", () => {
   bank.close();
   form.requestSubmit();
 });
+$("#bank-copy").addEventListener("click", async (e) => {
+  try {
+    await navigator.clipboard.writeText($("#bank-acct").textContent);
+    e.target.textContent = "Copied";
+    setTimeout(() => (e.target.textContent = "Copy"), 1500);
+  } catch {}
+});
 $("#bank-back").addEventListener("click", () => bank.close());
 $("#bank-x").addEventListener("click", () => bank.close());
 bank.addEventListener("click", (e) => {
