@@ -303,10 +303,17 @@ form.addEventListener("submit", async (e) => {
     err.textContent = "Please enter a valid email. 請填寫正確的電子郵件。";
     return;
   }
-  if (data.payment !== "cash") {
+  if (data.payment !== "cash" && data.payment !== "bank") {
     err.textContent = "Please choose a payment method. 請選擇付款方式。";
     return;
   }
+  if (data.payment === "bank" && !bankOk) {
+    $("#bank-total").textContent = count() && priceable() ? money(total()) : "—";
+    $("#bank-err").textContent = "";
+    if (!bank.open) bank.showModal();
+    return;
+  }
+  bankOk = false;
   const btn = $("#place");
   btn.disabled = true;
   btn.textContent = "Placing order…";
@@ -338,6 +345,20 @@ form.addEventListener("submit", async (e) => {
   btn.textContent = "Place order";
 });
 
+// Bank-transfer popup: confirming it places the order
+const bank = $("#bank");
+let bankOk = false;
+$("#bank-go").addEventListener("click", () => {
+  bankOk = true;
+  bank.close();
+  form.requestSubmit();
+});
+$("#bank-back").addEventListener("click", () => bank.close());
+$("#bank-x").addEventListener("click", () => bank.close());
+bank.addEventListener("click", (e) => {
+  if (e.target === bank) bank.close();
+});
+
 function showDone(out, data) {
   try {
     localStorage.setItem(KEY, JSON.stringify({ name: data.name, email: data.email.trim() }));
@@ -352,6 +373,7 @@ function showDone(out, data) {
     ? `A confirmation email is on its way to ${data.email.trim()}.`
     : `We have your order and will be in touch at ${data.email.trim()}.`;
   $("#done-when").textContent = `${day(cur.delivery)} morning`;
+  $("#done-method").textContent = data.payment === "bank" ? "Bank transfer · 銀行轉帳" : "In-person cash · 當面現金";
   const dp = $("#done-pay");
   dp.hidden = !paymentNote;
   dp.textContent = paymentNote;

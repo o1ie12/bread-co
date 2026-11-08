@@ -4,40 +4,6 @@
   "paymentNote": "",
   "weeks": [
     {
-      "id": "w1102",
-      "deadline": "2026-11-02T17:00",
-      "delivery": "2026-11-04",
-      "items": [
-        {
-          "id": "1102a",
-          "zh": "巧克力麵包",
-          "en": "Chocolate Bread",
-          "tone": "#3a2216",
-          "img": "",
-          "price": null,
-          "stock": null
-        },
-        {
-          "id": "1102b",
-          "zh": "奶酥麵包",
-          "en": "Milk Crumble Bun",
-          "tone": "#d9a35f",
-          "img": "",
-          "price": null,
-          "stock": null
-        },
-        {
-          "id": "1102c",
-          "zh": "蔥麵包",
-          "en": "Scallion Bread",
-          "tone": "#6b7140",
-          "img": "",
-          "price": null,
-          "stock": null
-        }
-      ]
-    },
-    {
       "id": "w1109",
       "deadline": "2026-11-09T17:00",
       "delivery": "2026-11-11",

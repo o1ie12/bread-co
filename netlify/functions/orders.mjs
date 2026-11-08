@@ -43,7 +43,7 @@ async function placeOrder(req) {
   const note = clean(b.note, 240);
   if (!name) throw new HttpError(400, { error: "Please enter your name." });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "Please enter a valid email address." });
-  if (payment !== "cash") throw new HttpError(400, { error: "That payment method isn't available yet. Please choose in-person cash." });
+  if (payment !== "cash" && payment !== "bank") throw new HttpError(400, { error: "Please choose a payment method." });
 
   const cfg = await loadConfig();
   const week = cfg.weeks.find((w) => w.id === b.week);

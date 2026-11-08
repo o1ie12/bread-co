@@ -381,7 +381,7 @@ function renderOrders() {
         <td class="c-name">${esc(o.name)}</td>
         <td class="c-email">${esc(o.email || o.contact || "")}${mailLine(o)}</td>
         <td class="c-order">${o.items.map((i) => `<div><b>${i.qty}×</b> ${esc(i.zh)}${i.en ? ` <small>${esc(i.en)}</small>` : ""}</div>`).join("")}${o.total != null ? `<div class="amt">${money(o.total)}</div>` : ""}</td>
-        <td class="c-pay">${o.payment === "cash" ? "In-person cash" : esc(o.payment || "")}</td>
+        <td class="c-pay">${o.payment === "cash" ? "In-person cash" : o.payment === "bank" ? "Bank transfer" : esc(o.payment || "")}</td>
         <td class="c-note">${o.address ? esc(o.address) + (o.note ? " · " : "") : ""}${esc(o.note || "")}</td>
         <td class="c-status"><select class="o-status" aria-label="Status">${["new", "paid", "delivered", "cancelled"].map((s) => `<option value="${s}"${s === o.status ? " selected" : ""}>${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}</select></td>
       </tr>`
@@ -431,7 +431,7 @@ $("#ord-csv").addEventListener("click", () => {
   const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const head = ["Order", "Time", "Name", "Email", "Payment", "Items", "Total", "Status", "Note"];
   const lines = orders.map((o) =>
-    [o.no, new Date(o.at).toLocaleString("en-US"), o.name, o.email || o.contact || "", o.payment === "cash" ? "In-person cash" : o.payment || "", o.items.map((i) => `${i.qty}x ${i.zh} ${i.en || ""}`.trim()).join("; "), o.total ?? "", o.status, o.note].map(q).join(",")
+    [o.no, new Date(o.at).toLocaleString("en-US"), o.name, o.email || o.contact || "", o.payment === "cash" ? "In-person cash" : o.payment === "bank" ? "Bank transfer" : o.payment || "", o.items.map((i) => `${i.qty}x ${i.zh} ${i.en || ""}`.trim()).join("; "), o.total ?? "", o.status, o.note].map(q).join(",")
   );
   const blob = new Blob(["﻿" + [head.map(q).join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");

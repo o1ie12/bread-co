@@ -85,9 +85,9 @@
           <label>電子郵件 · Email<input name="email" type="email" required autocomplete="email" inputmode="email" maxlength="120"></label>
           <fieldset class="methods">
             <legend>付款方式 · Payment method</legend>
-            <label class="opt off">
-              <input type="radio" name="payment" value="bank" disabled>
-              <span><b>銀行轉帳 · Bank transfer</b><small>Unavailable for now · 暫不開放</small></span>
+            <label class="opt">
+              <input type="radio" name="payment" value="bank">
+              <span><b>銀行轉帳 · Bank transfer</b><small>Scan a QR code in your banking app · 掃碼轉帳</small></span>
             </label>
             <label class="opt">
               <input type="radio" name="payment" value="cash" checked>
@@ -110,9 +110,24 @@
         <div class="total"><span>Total</span><b id="done-total">—</b></div>
         <p class="pay" id="done-pay" hidden></p>
         <p class="done-note"><span id="done-mail"></span> Delivered <b id="done-when"></b>.</p>
-        <p class="done-pay">Payment: <b>In-person cash · 當面現金</b></p>
+        <p class="done-pay">Payment: <b id="done-method">In-person cash · 當面現金</b></p>
         <button class="btn wide" id="done-close" type="button">Done</button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- Bank transfer popup -->
+  <dialog id="bank" aria-labelledby="bank-title">
+    <div class="bank-in" data-lenis-prevent>
+      <button class="sheet-x" id="bank-x" type="button" aria-label="Close">×</button>
+      <p class="label">銀行轉帳 · Bank transfer</p>
+      <h2 id="bank-title">Scan to pay</h2>
+      <img class="bank-qr" src="assets/bank-qr.png" width="286" height="284" alt="TWQR bank transfer QR code">
+      <div class="total"><span>Amount 金額</span><b id="bank-total">—</b></div>
+      <p class="bank-help">Open your banking app, scan the code and transfer the amount above, then press the button below. 請用銀行 App 掃描轉帳上方金額,完成後按下確認。</p>
+      <p class="form-err" id="bank-err" role="alert"></p>
+      <button class="btn wide" id="bank-go" type="button">Confirm order &amp; payment · 確認訂單並付款</button>
+      <button class="link-btn bank-back" id="bank-back" type="button">← Back</button>
     </div>
   </dialog>
 

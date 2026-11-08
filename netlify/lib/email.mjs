@@ -35,7 +35,7 @@ const dayLabel = (s) => {
   const dt = new Date(y, m - 1, d);
   return `${dt.toLocaleDateString("en-US", { weekday: "short" })} ${m}/${d}`;
 };
-export const PAYMENT_LABEL = { cash: ["當面現金", "In-person cash"] };
+export const PAYMENT_LABEL = { cash: ["當面現金", "In-person cash"], bank: ["銀行轉帳", "Bank transfer"] };
 
 // Confirmation to the customer (bilingual)
 export function confirmationEmail(order, week, paymentNote) {
