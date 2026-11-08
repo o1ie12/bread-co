@@ -70,7 +70,7 @@ const ymd = (s) => {
 const wk = (s) => ymd(s).toLocaleDateString("en-US", { weekday: "short" });
 const md = (s) => `${ymd(s).getMonth() + 1}/${ymd(s).getDate()}`;
 const day = (s) => `${wk(s)} ${md(s)}`;
-const money = (n) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+const money = (n) => `NT$${Number.isInteger(n) ? n : n.toFixed(2)}`;
 const hour12 = (s) => {
   const [h, m] = s.split("T")[1].split(":").map(Number);
   return `${h % 12 || 12}${m ? ":" + String(m).padStart(2, "0") : ""} ${h >= 12 ? "PM" : "AM"}`;

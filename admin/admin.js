@@ -26,7 +26,7 @@ const parse = (s) => {
   return new Date(y, m - 1, dd, hh, mm);
 };
 const fmt = (s) => parse(s).toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" });
-const money = (n) => (n == null ? "" : `$${Number.isInteger(n) ? n : n.toFixed(2)}`);
+const money = (n) => (n == null ? "" : `NT$${Number.isInteger(n) ? n : n.toFixed(2)}`);
 const closesAt = (w) => wallToEpoch(w.deadline, cfg.timezone);
 
 async function api(path, opts = {}) {
@@ -128,7 +128,7 @@ function itemHTML(it, wi, ii) {
         <label>中文名稱<input class="zh" data-f="zh" value="${esc(it.zh)}" placeholder="例如：巧克力麵包"></label>
         <label>English name<input data-f="en" value="${esc(it.en)}" placeholder="e.g. Chocolate Bread"></label>
         <div class="pair">
-          <label>Price ($)<input data-f="price" type="number" min="0" step="0.5" inputmode="decimal" value="${it.price ?? ""}" placeholder="40"></label>
+          <label>Price (NT$)<input data-f="price" type="number" min="0" step="0.5" inputmode="decimal" value="${it.price ?? ""}" placeholder="40"></label>
           <label>Stock (empty = unlimited)<input data-f="stock" type="number" min="0" step="1" inputmode="numeric" value="${it.stock ?? ""}" placeholder="10"></label>
         </div>
         <div>

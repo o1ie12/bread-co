@@ -29,7 +29,7 @@ export async function sendMail({ to, subject, html, text, replyTo }) {
 /* ───────────── message building ───────────── */
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-const money = (n) => (n == null ? "" : `$${Number.isInteger(n) ? n : n.toFixed(2)}`);
+const money = (n) => (n == null ? "" : `NT$${Number.isInteger(n) ? n : n.toFixed(2)}`);
 const dayLabel = (s) => {
   const [y, m, d] = s.slice(0, 10).split("-").map(Number);
   const dt = new Date(y, m - 1, d);
