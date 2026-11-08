@@ -4,7 +4,7 @@ import { wallToEpoch } from "./shared/time.js";
 
 // Weekly breads (names, prices, stock) come from the admin page (/admin) via /api/weeks.
 // If that isn't available (e.g. running locally) the site falls back to data/weeks.json.
-// The first week whose order deadline hasn't passed is "this week"; the next one is "next week".
+// The first week whose order deadline hasn't passed is "this week".
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -58,8 +58,6 @@ const nowMs = () => t0 + (Date.now() - loadedAt);
 
 const idx = WEEKS.findIndex((w) => w.closesAt > nowMs());
 const cur = WEEKS[idx];
-const next = idx >= 0 ? WEEKS[idx + 1] : undefined;
-const after = idx >= 0 ? WEEKS[idx + 2] : undefined;
 
 /* ───────────── Formatting ───────────── */
 
@@ -85,9 +83,6 @@ function remaining() {
   return d > 0 ? `${d}d ${h}h` : `${h}h ${m % 60}m`;
 }
 
-const dateRows = (w) => `
-  <div><dt>訂單截止 · Order by</dt><dd>${day(w.deadline)}, ${hour12(w.deadline)}</dd></div>
-  <div><dt>早上送貨 · Delivered</dt><dd>${day(w.delivery)} morning</dd></div>`;
 
 /* ───────────── Order page ───────────── */
 
@@ -399,31 +394,6 @@ function showDone(out, data) {
   $("#sheet-form").hidden = true;
   $("#sheet-done").hidden = false;
   sheet.querySelector(".sheet-in").scrollTop = 0;
-}
-
-/* ───────────── Next week ───────────── */
-
-if (next) {
-  $("#next").hidden = false;
-  $("#next-dates").innerHTML = dateRows(next);
-  $("#rows").innerHTML = next.items
-    .map(
-      (it, i) => `
-      <li class="row rv">
-        <span class="row-no">0${i + 1}</span>
-        <strong>${it.zh}</strong>
-        <i></i>
-        <em>${it.en}${it.price != null ? ` · ${money(it.price)}` : ""}</em>
-      </li>`
-    )
-    .join("");
-  if (after) {
-    const a = $("#after");
-    a.hidden = false;
-    a.innerHTML = `
-      <p class="label">The week after · ${md(after.delivery)}</p>
-      <p class="names">${after.items.map((it) => `<span>${it.zh}<small>${it.en}</small></span>`).join("")}</p>`;
-  }
 }
 
 /* ───────────── Wordmark, nav theme, reveals ───────────── */

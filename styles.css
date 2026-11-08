@@ -190,24 +190,6 @@ section { padding: clamp(80px, 10vw, 150px) var(--gutter); }
 .dates dt { font: 500 0.64rem var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
 .dates dd { margin-top: 2px; font: 400 1.25rem var(--serif); }
 
-/* Next week: printed-menu list */
-.next { background: var(--cream); }
-.next-head { align-items: end; margin-bottom: clamp(36px, 5vw, 72px); }
-.nh-l { grid-column: 1 / span 8; }
-.next-head h2 { font-size: clamp(3rem, 6vw, 6rem); margin-top: 1.2rem; }
-.next-head .dates { grid-column: 10 / span 3; }
-.rows { border-top: 1px solid var(--line); }
-.row { display: flex; align-items: baseline; gap: 18px; padding: clamp(18px, 2.2vw, 28px) 0; border-bottom: 1px solid var(--line); }
-.row-no { font: 500 0.66rem var(--sans); letter-spacing: 0.22em; color: var(--crust); width: 2.4rem; flex: none; }
-.row strong { font: 400 clamp(1.7rem, 3.4vw, 3rem)/1.2 var(--zh); letter-spacing: 0.05em; }
-.row i { flex: 1; align-self: flex-end; margin-bottom: 0.55em; border-bottom: 1px dotted rgba(43, 27, 18, 0.4); min-width: 24px; }
-.row em { font: 400 clamp(1rem, 1.3vw, 1.2rem) var(--serif); font-style: normal; color: var(--muted); text-align: right; }
-.after { margin-top: clamp(36px, 5vw, 64px); display: flex; gap: 2rem; align-items: baseline; flex-wrap: wrap; }
-.after .label { color: var(--muted); min-width: 14rem; }
-.after .names { display: flex; gap: clamp(1.4rem, 3.4vw, 3rem); flex-wrap: wrap; }
-.after .names span { font: 400 1.25rem var(--zh); letter-spacing: 0.05em; }
-.after small { display: block; margin-top: 2px; font: 400 0.9rem var(--serif); color: var(--muted); }
-
 /* Footer */
 .footer { background: var(--ink); color: var(--cream); padding: 22px var(--gutter) 0; overflow: hidden; }
 .footer-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font: 500 0.64rem var(--sans); letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.65; }
@@ -237,12 +219,6 @@ section { padding: clamp(80px, 10vw, 150px) var(--gutter); }
   .c-price { font-size: 1.2rem; }
   .c-body { gap: 10px; }
   .stepper button { width: 42px; height: 38px; }
-  .next-head { display: block; }
-  .next-head .dates { margin-top: 28px; }
-  .row { flex-wrap: wrap; }
-  .row i { display: none; }
-  .row em { width: 100%; text-align: left; padding-left: calc(2.4rem + 18px); margin-top: -4px; }
-  .after .label { min-width: 100%; }
   .cartbar { left: 12px; right: 12px; transform: none; justify-content: space-between; animation-name: rise-m; }
   @keyframes rise-m { from { opacity: 0; transform: translateY(24px); } }
 }
