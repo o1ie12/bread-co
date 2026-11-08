@@ -430,19 +430,6 @@ document.querySelectorAll(".rv").forEach((el, i) => {
   io.observe(el);
 });
 
-// Statement: words light up as you scroll
-const st = $("#statement");
-st.innerHTML = st.textContent.trim().split(/\s+/).map((w) => `<span>${w}</span>`).join(" ");
-const spans = [...st.children];
-function lightWords() {
-  const r = st.getBoundingClientRect();
-  const p = Math.min(1, Math.max(0, (innerHeight * 0.85 - r.top) / (r.height + innerHeight * 0.3)));
-  const n = Math.round(p * spans.length);
-  spans.forEach((s, i) => s.classList.toggle("on", i < n));
-}
-addEventListener("scroll", lightWords, { passive: true });
-lightWords();
-
 $("#year").textContent = new Date().getFullYear();
 
 /* ───────────── Smooth scroll (Lenis) ───────────── */
