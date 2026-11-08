@@ -82,7 +82,7 @@ export function ownerEmail(order, week, adminUrl) {
   const text = [
     `New order ${no}${order.total != null ? " — " + money(order.total) : ""}`,
     `${order.name} <${order.email}>`,
-    `Payment: ${(PAYMENT_LABEL[order.payment] || [])[1] || order.payment}`,
+    `Payment: ${(PAYMENT_LABEL[order.payment] || [])[1] || order.payment}${order.transferLast5 ? ` (transfer from …${order.transferLast5})` : ""}`,
     ...lines,
     order.note ? `Note: ${order.note}` : "",
     `Delivery: ${dayLabel(week.delivery)} morning`,

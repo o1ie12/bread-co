@@ -128,9 +128,10 @@
         <p class="acct-no"><b id="bank-acct">0635979236395</b><button class="link-btn" id="bank-copy" type="button">Copy</button></p>
       </div>
       <div class="total"><span>Amount 金額</span><b id="bank-total">—</b></div>
+      <label class="bank-last">轉帳後五碼 · Last 5 digits of the account you transferred from<input id="bank-last5" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="off" placeholder="12345"></label>
       <p class="bank-help">Open your banking app, scan the code and transfer the amount above, then press the button below. 請用銀行 App 掃描轉帳上方金額,完成後按下確認。</p>
       <p class="form-err" id="bank-err" role="alert"></p>
-      <button class="btn wide" id="bank-go" type="button">Confirm order &amp; payment · 確認訂單並付款</button>
+      <button class="btn wide" id="bank-go" type="button" disabled>Confirm order &amp; payment · 確認訂單並付款</button>
       <button class="link-btn bank-back" id="bank-back" type="button">← Back</button>
     </div>
   </dialog>

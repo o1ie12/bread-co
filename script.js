@@ -311,6 +311,7 @@ form.addEventListener("submit", async (e) => {
     $("#bank-total").textContent = count() && priceable() ? money(total()) : "—";
     $("#bank-err").textContent = "";
     if (!bank.open) bank.showModal();
+    syncBank();
     return;
   }
   bankOk = false;
@@ -324,7 +325,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         week: cur.id,
         items: Object.entries(cart).map(([id, qty]) => ({ id, qty })),
-        name: data.name, email: data.email.trim(), payment: data.payment, note: data.note, hp: data.hp,
+        name: data.name, email: data.email.trim(), payment: data.payment, transferLast5: data.payment === "bank" ? last5.value : undefined, note: data.note, hp: data.hp,
       }),
     });
     const out = await res.json().catch(() => ({}));
@@ -348,7 +349,14 @@ form.addEventListener("submit", async (e) => {
 // Bank-transfer popup: confirming it places the order
 const bank = $("#bank");
 let bankOk = false;
+const last5 = $("#bank-last5");
+const syncBank = () => {
+  last5.value = last5.value.replace(/\D/g, "").slice(0, 5);
+  $("#bank-go").disabled = last5.value.length !== 5;
+};
+last5.addEventListener("input", syncBank);
 $("#bank-go").addEventListener("click", () => {
+  if (last5.value.length !== 5) return;
   bankOk = true;
   bank.close();
   form.requestSubmit();

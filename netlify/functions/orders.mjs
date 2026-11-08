@@ -45,6 +45,9 @@ async function placeOrder(req) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "Please enter a valid email address." });
   if (payment !== "cash" && payment !== "bank") throw new HttpError(400, { error: "Please choose a payment method." });
 
+  const transferLast5 = payment === "bank" ? clean(b.transferLast5, 5) : "";
+  if (payment === "bank" && !/^\d{5}$/.test(transferLast5)) throw new HttpError(400, { error: "Please enter the last 5 digits of the account you transferred from. 請填寫轉帳後五碼。" });
+
   const cfg = await loadConfig();
   const week = cfg.weeks.find((w) => w.id === b.week);
   if (!week) throw new HttpError(404, { error: "That week isn't available." });
@@ -111,7 +114,7 @@ async function placeOrder(req) {
   const order = {
     no,
     at: new Date().toISOString(),
-    name, email, payment, note,
+    name, email, payment, ...(transferLast5 ? { transferLast5 } : {}), note,
     items: lines.map(({ stock, ...rest }) => rest),
     total,
     status: "new",

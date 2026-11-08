@@ -268,3 +268,6 @@ section { padding: clamp(80px, 10vw, 150px) var(--gutter); }
 .bank-acct b { color: var(--ink); font-weight: 500; }
 .bank-acct .acct-no { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
 .bank-acct .acct-no b { font: 500 1.35rem var(--serif); letter-spacing: 0.04em; user-select: all; }
+.bank-last { display: grid; gap: 6px; text-align: left; margin: 0 0 14px; font: 500 0.64rem/1.5 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.bank-last input { font: 500 1.4rem var(--serif); letter-spacing: 0.4em; padding: 10px 12px; border: 1px solid var(--ink); background: transparent; color: var(--ink); width: 100%; box-sizing: border-box; border-radius: 0; }
+.bank-last input:focus { outline: 2px solid var(--crust); outline-offset: 2px; }
