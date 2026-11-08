@@ -86,6 +86,7 @@ function showTab(name) {
     $(`#tab-${t}`).classList.toggle("on", t === name);
   }
   $("#savebar").hidden = name !== "menu";
+  $("#app").classList.toggle("wide", name === "orders");
   if (name === "orders") loadOrders();
 }
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
@@ -367,30 +368,30 @@ function renderOrders() {
     $("#ord-list").innerHTML = `<p class="empty">No orders yet for this week.</p>`;
     return;
   }
-  $("#ord-list").innerHTML = [...orders]
-    .reverse()
+  const when = (o) => new Date(o.at).toLocaleString("en-US", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const mailLine = (o) =>
+    o.email
+      ? `<div class="mail ${esc(o.emailStatus || "off")}">${o.emailStatus === "sent" ? "✓ confirmation sent" : o.emailStatus === "failed" ? "✕ email failed" : "no confirmation sent"} · <button type="button" class="link-btn" data-resend="${o.no}">${o.emailStatus === "sent" ? "resend" : "send"}</button></div>`
+      : "";
+  const trs = orders
     .map(
       (o) => `
-    <article class="order${o.status === "cancelled" ? " cancelled" : ""}" data-no="${o.no}">
-      <div class="o-top">
-        <div><span class="o-no">#${String(o.no).padStart(3, "0")}</span><span class="o-time">${esc(new Date(o.at).toLocaleString("en-US", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" }))}</span></div>
-        <select class="o-status" aria-label="Status">
-          ${["new", "paid", "delivered", "cancelled"].map((s) => `<option value="${s}"${s === o.status ? " selected" : ""}>${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}
-        </select>
-      </div>
-      <div class="o-body">
-        <div class="o-who"><b>${esc(o.name)}</b>
-          <span>${esc(o.email || o.contact || "")}</span>
-          ${o.address ? `<span>${esc(o.address)}</span>` : ""}
-          <span class="o-pay">${o.payment === "cash" ? "In-person cash" : esc(o.payment || "")}</span>
-          ${o.email ? `<span class="o-mail ${esc(o.emailStatus || "off")}">${o.emailStatus === "sent" ? "Confirmation email sent" : o.emailStatus === "failed" ? "Confirmation email failed" : "No confirmation email sent"} · <button type="button" class="link-btn" data-resend="${o.no}">${o.emailStatus === "sent" ? "Resend" : "Send"}</button></span>` : ""}
-          ${o.note ? `<em>“${esc(o.note)}”</em>` : ""}</div>
-        <ul class="o-items">${o.items.map((i) => `<li><b>${i.qty}×</b> ${esc(i.zh)}${i.en ? ` <small>${esc(i.en)}</small>` : ""}</li>`).join("")}</ul>
-        <div class="o-total">${o.total != null ? money(o.total) : ""}</div>
-      </div>
-    </article>`
+      <tr class="order${o.status === "cancelled" ? " cancelled" : ""}" data-no="${o.no}">
+        <td class="c-no"><b>${String(o.no).padStart(3, "0")}</b><small>${esc(when(o))}</small></td>
+        <td class="c-name">${esc(o.name)}</td>
+        <td class="c-email">${esc(o.email || o.contact || "")}${mailLine(o)}</td>
+        <td class="c-order">${o.items.map((i) => `<div><b>${i.qty}×</b> ${esc(i.zh)}${i.en ? ` <small>${esc(i.en)}</small>` : ""}</div>`).join("")}${o.total != null ? `<div class="amt">${money(o.total)}</div>` : ""}</td>
+        <td class="c-pay">${o.payment === "cash" ? "In-person cash" : esc(o.payment || "")}</td>
+        <td class="c-note">${o.address ? esc(o.address) + (o.note ? " · " : "") : ""}${esc(o.note || "")}</td>
+        <td class="c-status"><select class="o-status" aria-label="Status">${["new", "paid", "delivered", "cancelled"].map((s) => `<option value="${s}"${s === o.status ? " selected" : ""}>${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}</select></td>
+      </tr>`
     )
     .join("");
+  $("#ord-list").innerHTML = `
+    <div class="sheet-wrap"><table class="sheet">
+      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Order</th><th>Payment</th><th>Notes</th><th>Status</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table></div>`;
 }
 
 $("#ord-list").addEventListener("click", async (e) => {
