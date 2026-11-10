@@ -136,3 +136,17 @@ select:focus { outline: none; border-color: var(--ink); }
 }
 
 .c-pay small { display: block; color: var(--muted); }
+
+/* add / edit order dialog */
+#ord-edit { position: fixed; inset: 0; margin: auto; height: fit-content; border: 1px solid var(--ink); background: var(--cream); color: var(--ink); padding: 0; width: min(520px, calc(100vw - 24px)); max-height: 92vh; overflow: auto; }
+#ord-edit::backdrop { background: rgba(43, 27, 18, 0.5); }
+.oe { padding: 26px; display: grid; gap: 14px; }
+.oe h2 { margin: 0; }
+.oe label { display: grid; gap: 6px; }
+.oe-items { border: 1px solid var(--line); padding: 10px 14px 14px; margin: 0; }
+.oe-items legend { font: 500 0.64rem var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 0 6px; }
+.oe-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
+.oe-row span small { display: block; color: var(--muted); font-size: 0.78rem; }
+.oe-row input { width: 76px; margin: 0; text-align: center; }
+.oe-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.c-no .link-btn { margin-top: 6px; font-size: 0.58rem; }

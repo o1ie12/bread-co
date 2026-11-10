@@ -377,7 +377,7 @@ function renderOrders() {
     .map(
       (o) => `
       <tr class="order${o.status === "cancelled" ? " cancelled" : ""}" data-no="${o.no}">
-        <td class="c-no"><b>${String(o.no).padStart(3, "0")}</b><small>${esc(when(o))}</small></td>
+        <td class="c-no"><b>${String(o.no).padStart(3, "0")}</b><small>${esc(when(o))}</small>${o.status !== "cancelled" ? `<button type="button" class="link-btn" data-edit="${o.no}">Edit</button>` : ""}</td>
         <td class="c-name">${esc(o.name)}</td>
         <td class="c-email">${esc(o.email || o.contact || "")}${mailLine(o)}</td>
         <td class="c-order">${o.items.map((i) => `<div><b>${i.qty}×</b> ${esc(i.zh)}${i.en ? ` <small>${esc(i.en)}</small>` : ""}</div>`).join("")}${o.total != null ? `<div class="amt">${money(o.total)}</div>` : ""}</td>
@@ -425,6 +425,66 @@ $("#ord-list").addEventListener("change", async (e) => {
     alert(err.message);
     sel.value = prev;
   }
+});
+
+/* ── add / edit an order (works any time, even after the deadline) ── */
+const oe = $("#ord-edit");
+const oeForm = $("#oe-form");
+let editing = null; // order being edited, or null when adding
+
+function oeSync() {
+  $("#oe-l5").hidden = oeForm.elements.payment.value !== "bank";
+}
+oeForm.elements.payment.addEventListener("change", oeSync);
+
+function openEditor(o) {
+  const week = cfg.weeks.find((w) => w.id === weekId);
+  if (!week) return;
+  editing = o || null;
+  $("#oe-title").textContent = o ? `Edit order ${String(o.no).padStart(3, "0")}` : "Add order";
+  $("#oe-status-l").hidden = !!o;
+  $("#oe-err").textContent = "";
+  oeForm.reset();
+  oeForm.elements.name.value = o?.name || "";
+  oeForm.elements.email.value = o?.email || "";
+  oeForm.elements.payment.value = o?.payment === "bank" ? "bank" : "cash";
+  oeForm.elements.transferLast5.value = o?.transferLast5 || "";
+  oeForm.elements.note.value = o?.note || "";
+  const lines = week.items.map((it) => ({ id: it.id, zh: it.zh, en: it.en, price: it.price }));
+  for (const i of o?.items || []) if (!lines.some((l) => l.id === i.id)) lines.push({ id: i.id, zh: i.zh, en: i.en, price: i.price });
+  $("#oe-items").innerHTML = lines
+    .map((l) => `<div class="oe-row"><span>${esc(l.zh)}<small>${esc(l.en)}${l.price != null ? " · " + money(l.price) : ""}</small></span><input type="number" min="0" max="50" step="1" inputmode="numeric" data-id="${esc(l.id)}" value="${o?.items.find((i) => i.id === l.id)?.qty || 0}" aria-label="Quantity of ${esc(l.en || l.zh)}"></div>`)
+    .join("");
+  oeSync();
+  oe.showModal();
+}
+$("#ord-add").addEventListener("click", () => openEditor(null));
+$("#oe-cancel").addEventListener("click", () => oe.close());
+$("#ord-list").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-edit]");
+  if (b) openEditor(orders.find((o) => o.no === Number(b.dataset.edit)));
+});
+oeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = oeForm.elements;
+  const items = [...oeForm.querySelectorAll("#oe-items input")].map((i) => ({ id: i.dataset.id, qty: Math.floor(Number(i.value)) })).filter((i) => i.qty > 0);
+  const err = $("#oe-err");
+  err.textContent = "";
+  if (!f.name.value.trim()) return void (err.textContent = "Please enter a name.");
+  if (!items.length) return void (err.textContent = "Add at least one bread.");
+  const body = { week: weekId, name: f.name.value, email: f.email.value, payment: f.payment.value, transferLast5: f.transferLast5.value, note: f.note.value, items };
+  if (editing) Object.assign(body, { action: "edit", no: editing.no });
+  else body.status = f.status.value;
+  const btn = $("#oe-save");
+  btn.disabled = true;
+  try {
+    await api("/api/admin/orders", { method: editing ? "PATCH" : "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    oe.close();
+    await loadOrders();
+  } catch (ex) {
+    err.textContent = ex.message;
+  }
+  btn.disabled = false;
 });
 
 $("#ord-csv").addEventListener("click", () => {

@@ -32,26 +32,28 @@ async function notify(order, week, cfg, req) {
   return status;
 }
 
-async function placeOrder(req) {
+// `admin` = the owner adding an order by hand: skips the deadline, honeypot, and the email / transfer-digits requirements.
+async function placeOrder(req, admin = false) {
   const b = await req.json().catch(() => null);
   if (!b) throw new HttpError(400, { error: "Bad request" });
-  if (b.hp) return json({ ok: true }); // honeypot: bots fill this in; pretend it worked
+  if (!admin && b.hp) return json({ ok: true }); // honeypot: bots fill this in; pretend it worked
 
   const name = clean(b.name, 60);
   const email = clean(b.email, 120);
   const payment = clean(b.payment, 20);
   const note = clean(b.note, 240);
   if (!name) throw new HttpError(400, { error: "Please enter your name." });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "Please enter a valid email address." });
+  if (!(admin && !email) && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "Please enter a valid email address." });
   if (payment !== "cash" && payment !== "bank") throw new HttpError(400, { error: "Please choose a payment method." });
 
-  const transferLast5 = payment === "bank" ? clean(b.transferLast5, 5) : "";
-  if (payment === "bank" && !/^\d{5}$/.test(transferLast5)) throw new HttpError(400, { error: "Please enter the last 5 digits of the account you transferred from. 請填寫轉帳後五碼。" });
+  let transferLast5 = payment === "bank" ? clean(b.transferLast5, 5) : "";
+  if (admin && !/^\d{5}$/.test(transferLast5)) transferLast5 = "";
+  if (!admin && payment === "bank" && !/^\d{5}$/.test(transferLast5)) throw new HttpError(400, { error: "Please enter the last 5 digits of the account you transferred from. 請填寫轉帳後五碼。" });
 
   const cfg = await loadConfig();
   const week = cfg.weeks.find((w) => w.id === b.week);
   if (!week) throw new HttpError(404, { error: "That week isn't available." });
-  if (Date.now() >= wallToEpoch(week.deadline, cfg.timezone)) throw new HttpError(410, { error: "Orders for this week are closed." });
+  if (!admin && Date.now() >= wallToEpoch(week.deadline, cfg.timezone)) throw new HttpError(410, { error: "Orders for this week are closed." });
 
   // merge duplicate lines, validate each bread and quantity
   const qty = new Map();
@@ -105,7 +107,9 @@ async function placeOrder(req) {
     const sold = await soldCounts(store, week.id);
     const left = Math.max(0, failed.stock - (sold[failed.id] || 0));
     throw new HttpError(409, {
-      error: left === 0 ? `Sorry, ${failed.en || failed.zh} just sold out.` : `Sorry, only ${left} ${failed.en || failed.zh} left.`,
+      error:
+        (left === 0 ? `Sorry, ${failed.en || failed.zh} just sold out.` : `Sorry, only ${left} ${failed.en || failed.zh} left.`) +
+        (admin ? " Raise its stock in the Menu tab first." : ""),
       sold,
     });
   }
@@ -117,15 +121,97 @@ async function placeOrder(req) {
     name, email, payment, ...(transferLast5 ? { transferLast5 } : {}), note,
     items: lines.map(({ stock, ...rest }) => rest),
     total,
-    status: "new",
+    status: admin && STATUSES.has(b.status) && b.status !== "cancelled" ? b.status : "new",
+    ...(admin ? { addedByAdmin: true } : {}),
     slots: claimed,
   };
   await store.setJSON(orderKey(week.id, no), order);
 
   // 4. emails (a failure here never fails the order)
-  order.emailStatus = await notify(order, week, cfg, req);
+  order.emailStatus = admin ? "off" : await notify(order, week, cfg, req);
   await store.setJSON(orderKey(week.id, no), order);
   return json({ ok: true, no, total, emailed: order.emailStatus === "sent", sold: await soldCounts(store, week.id) });
+}
+
+// Owner edits an existing order (any time, deadline doesn't apply). Loaves are re-claimed / released to match.
+async function editOrder(b) {
+  if (!/^[a-z0-9-]{1,40}$/i.test(b.week || "")) throw new HttpError(400, { error: "Bad request" });
+  const store = ordersStore();
+  const key = orderKey(b.week, Number(b.no));
+  const o = await store.get(key, { type: "json" });
+  if (!o) throw new HttpError(404, { error: "Order not found" });
+  if (o.status === "cancelled") throw new HttpError(409, { error: "A cancelled order can't be edited." });
+  const cfg = await loadConfig();
+  const week = cfg.weeks.find((w) => w.id === b.week);
+  if (!week) throw new HttpError(404, { error: "That week isn't on the menu any more." });
+
+  const name = clean(b.name, 60);
+  const email = clean(b.email, 120);
+  const payment = clean(b.payment, 20);
+  const note = clean(b.note, 240);
+  let transferLast5 = payment === "bank" ? clean(b.transferLast5, 5) : "";
+  if (!/^\d{5}$/.test(transferLast5)) transferLast5 = "";
+  if (!name) throw new HttpError(400, { error: "Please enter a name." });
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, { error: "That email address doesn't look right." });
+  if (payment !== "cash" && payment !== "bank") throw new HttpError(400, { error: "Choose a payment method." });
+
+  const qty = new Map();
+  for (const l of Array.isArray(b.items) ? b.items : []) {
+    const n = Math.floor(Number(l.qty));
+    if (n >= 1 && n <= 50) qty.set(String(l.id), (qty.get(String(l.id)) || 0) + n);
+  }
+  const lines = [];
+  for (const [id, n] of qty) {
+    const item = week.items.find((it) => it.id === id);
+    const prev = o.items.find((i) => i.id === id);
+    if (!item && !prev) throw new HttpError(400, { error: "A bread in this order isn't on the menu." });
+    lines.push({ id, zh: prev?.zh ?? item.zh, en: prev?.en ?? item.en, price: prev ? prev.price : item.price ?? null, qty: n, stock: item?.stock ?? null });
+  }
+  if (!lines.length) throw new HttpError(400, { error: "An order needs at least one bread. Cancel it instead." });
+
+  // re-balance loaves: claim extra slots for bigger quantities, release for smaller ones
+  const have = {};
+  for (const k of o.slots || []) (have[k.split("/")[2]] ||= []).push(k);
+  const claimedNew = [];
+  const release = [];
+  let failed = null;
+  for (const l of lines) {
+    const cur = have[l.id] || [];
+    if (l.stock == null) {
+      release.push(...cur);
+    } else if (l.qty > cur.length) {
+      const got = await claimSlots(store, week.id, { id: l.id, stock: l.stock }, l.qty - cur.length, o.no);
+      claimedNew.push(...got);
+      if (got.length < l.qty - cur.length) {
+        failed = l;
+        break;
+      }
+    } else if (l.qty < cur.length) {
+      release.push(...cur.slice(l.qty));
+    }
+  }
+  for (const id of Object.keys(have)) if (!lines.some((l) => l.id === id)) release.push(...have[id]);
+  if (failed) {
+    await Promise.all(claimedNew.map((k) => store.delete(k)));
+    const sold = await soldCounts(store, week.id);
+    const left = Math.max(0, failed.stock - (sold[failed.id] || 0));
+    throw new HttpError(409, { error: `Only ${left} ${failed.en || failed.zh} left. Raise its stock in the Menu tab first.`, sold });
+  }
+
+  if (email !== (o.email || "")) delete o.emailStatus;
+  o.name = name;
+  o.email = email;
+  o.payment = payment;
+  o.note = note;
+  if (transferLast5) o.transferLast5 = transferLast5;
+  else delete o.transferLast5;
+  o.items = lines.map(({ stock, ...rest }) => rest);
+  o.total = lines.every((l) => l.price != null) ? lines.reduce((s, l) => s + l.price * l.qty, 0) : null;
+  o.slots = (o.slots || []).filter((k) => !release.includes(k)).concat(claimedNew);
+  o.edited = new Date().toISOString();
+  await store.setJSON(key, o);
+  await Promise.all(release.map((k) => store.delete(k)));
+  return json({ ok: true, sold: await soldCounts(store, week.id) });
 }
 
 export default async (req) => {
@@ -149,8 +235,10 @@ export default async (req) => {
         const store = ordersStore();
         return json({ orders: await readOrders(store, week), sold: await soldCounts(store, week) });
       }
+      if (req.method === "POST") return await placeOrder(req, true);
       if (req.method === "PATCH") {
         const b = await req.json().catch(() => ({}));
+        if (b.action === "edit") return await editOrder(b);
         if (b.action === "resend") {
           if (!/^[a-z0-9-]{1,40}$/i.test(b.week || "")) return json({ error: "Bad request" }, 400);
           if (!emailEnabled()) return json({ error: "Email isn't set up yet (see README)." }, 400);

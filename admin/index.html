@@ -43,6 +43,7 @@
       <div class="ord-bar">
         <label>Week<select id="ord-week"></select></label>
         <div class="ord-actions">
+          <button class="link-btn" id="ord-add" type="button">+ Add order</button>
           <button class="link-btn" id="ord-refresh" type="button">Refresh</button>
           <button class="link-btn" id="ord-csv" type="button">Download CSV</button>
         </div>
@@ -71,6 +72,25 @@
       <button class="btn" id="save" type="button" disabled>Save menu</button>
     </div>
   </div>
+
+  <dialog id="ord-edit" aria-labelledby="oe-title">
+    <form id="oe-form" class="oe" novalidate>
+      <p class="label">Orders</p>
+      <h2 id="oe-title">Edit order</h2>
+      <p class="help" id="oe-help">Works any time, even after the deadline.</p>
+      <label>Name<input name="name" required maxlength="60"></label>
+      <label>Email (optional)<input name="email" type="email" maxlength="120"></label>
+      <div class="pair">
+        <label>Payment<select name="payment"><option value="cash">In-person cash</option><option value="bank">Bank transfer</option></select></label>
+        <label id="oe-l5">Transfer last 5<input name="transferLast5" inputmode="numeric" maxlength="5" placeholder="12345"></label>
+      </div>
+      <fieldset class="oe-items"><legend>Order</legend><div id="oe-items"></div></fieldset>
+      <label>Notes<input name="note" maxlength="240"></label>
+      <label id="oe-status-l">Status<select name="status"><option value="new">New</option><option value="paid">Paid</option><option value="delivered">Delivered</option></select></label>
+      <p class="msg err" id="oe-err" role="alert"></p>
+      <div class="oe-btns"><button class="btn ghost" id="oe-cancel" type="button">Cancel</button><button class="btn" id="oe-save" type="submit">Save order</button></div>
+    </form>
+  </dialog>
 
   <script src="admin.js" type="module"></script>
 </body>
