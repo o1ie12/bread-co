@@ -5,6 +5,39 @@
 [functions]
   node_bundler = "esbuild"
 
+# The site publishes the repo root, so hide files that aren't part of the page:
+# handoff notes, package files and the server-side function code.
+# shared/ and data/ stay public because the page loads them.
+[[redirects]]
+  from = "/CLAUDE.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package-lock.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 [[headers]]
   for = "/admin/*"
   [headers.values]
